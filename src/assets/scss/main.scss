@@ -1,0 +1,38 @@
+::selection {
+	background: $primary-color;
+	color: $secondary-color;
+}
+
+* {
+	padding: unset;
+	margin: unset;
+	box-sizing: border-box;
+}
+
+html {
+	height: 100vh;
+	scroll-behavior: smooth;
+}
+
+body {
+	height: 100%;
+}
+
+#app {
+	height: 100%;
+	font-size: 15px;
+	position: relative;
+	font-family: $font-normal;
+}
+
+.is-desktop {
+	@media (max-width: 959px) {
+		display: none !important;
+	}
+}
+
+.is-mobile {
+	@media (min-width: 960px) {
+		display: none !important;
+	}
+}
