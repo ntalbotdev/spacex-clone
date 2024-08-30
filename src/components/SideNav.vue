@@ -15,33 +15,47 @@ export default {
       list2: ["Mission", "Launches", "Careers", "Updates", "Shop"],
     };
   },
+  mounted() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const section = entry.target;
+            section.classList.add("visible");
+            observer.unobserve(section);
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.5,
+      }
+    );
+    const lazyLoadSections = document.querySelectorAll(".header__sidenav-item");
+    lazyLoadSections.forEach((section) => {
+      observer.observe(section);
+    });
+  },
 };
 </script>
 
 <template>
   <div class="header__sidenav">
-    <ul class="header__sidenav-list is-mobile">
-      <transition-group name="slide-up">
-        <li
-          v-for="(item, index) in list1"
-          :key="index"
-          class="header__sidenav-item"
-        >
-		<a class="header__sidenav-link" href="#">{{ item }}</a>
-        </li>
-      </transition-group>
-    </ul>
-
     <ul class="header__sidenav-list">
-		<transition-group name="slide-up">
-        <li
-          v-for="(item, index) in list2"
-          :key="index"
-          class="header__sidenav-item"
-        >
-		<a class="header__sidenav-link" href="#">{{ item }}</a>
-        </li>
-      </transition-group>
+      <li
+        v-for="(item, index) in list1"
+        :key="index"
+        class="header__sidenav-item is-mobile"
+      >
+        <a class="header__sidenav-link" href="#">{{ item }}</a>
+      </li>
+      <li
+        v-for="(item, index) in list2"
+        :key="index"
+        class="header__sidenav-item"
+      >
+        <a class="header__sidenav-link" href="#">{{ item }}</a>
+      </li>
     </ul>
   </div>
 </template>
@@ -69,12 +83,38 @@ export default {
     @media all and (min-width: 960px) {
       padding: $padding-md $padding-lg;
     }
+
+    @for $i from 1 through 13 {
+      & li:nth-of-type(#{$i}) {
+        transition-delay: $i * 0.1s;
+      }
+    }
+
+    @media (min-width: 960px) {
+      @for $i from 1 through 7 {
+        & li:nth-of-type(#{$i}) {
+          transition: none;
+          transition-delay: 0s;
+        }
+      }
+
+      @for $i from 8 through 13 {
+        & li:not(.is-mobile):nth-of-type(#{$i}) {
+          transition-delay: ($i - 8) * 0.1s;
+        }
+      }
+    }
   }
 
   &-item {
-    opacity: 1;
-    transform: translateY(-10px);
-    transition: opacity 0.5s, transform 0.5s;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: opacity 1s ease, transform 1s ease, padding-bottom 1s ease;
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   &-link {

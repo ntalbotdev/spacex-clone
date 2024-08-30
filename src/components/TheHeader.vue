@@ -46,7 +46,8 @@ export default {
     },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-    }}
+    },
+  },
 };
 </script>
 
@@ -55,10 +56,7 @@ export default {
     <transition name="slide" appear>
       <div class="header__background" v-show="headerHasBg"></div>
     </transition>
-    <div
-      class="header__inner"
-      :class="{ 'is-hidden': isHeaderHidden }"
-    >
+    <div class="header__inner" :class="{ 'is-hidden': isHeaderHidden }">
       <a class="header__logo" href="https://www.spacex.com">
         <LogoImage class="header__logo-img" />
       </a>
@@ -96,20 +94,31 @@ export default {
           </li>
         </ul>
       </nav>
+
+      <transition name="slideLeft">
+        <SideNav
+          :class="{ 'header__sidenav--open': isSidebarOpen }"
+          v-show="isSidebarOpen"
+        />
+      </transition>
     </div>
 
-    <div class="header__hamburger-icon" :class="{ 'is-hidden': isHeaderHidden }" @click="toggleSidebar">
+    <div
+      class="header__hamburger-icon"
+      :class="{ 'is-hidden': isHeaderHidden }"
+      @click="toggleSidebar"
+    >
       <span :class="{ active: isSidebarOpen }"></span>
       <span :class="{ active: isSidebarOpen }"></span>
       <span :class="{ active: isSidebarOpen }"></span>
     </div>
-    <transition name="slideLeft">
-    <SideNav
-      :class="{ 'header__sidenav--open': isSidebarOpen }"
+
+    <div
+      class="overlay"
+      :class="{ 'overlay--show': isSidebarOpen }"
       v-show="isSidebarOpen"
-    />
-  </transition>
-    <div class="overlay" :class="{ 'overlay--show': isSidebarOpen }" v-show="isSidebarOpen" @click="toggleSidebar"></div>
+      @click="toggleSidebar"
+    ></div>
   </header>
 </template>
 
@@ -182,12 +191,13 @@ export default {
   }
 
   .is-hidden {
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.19, 0.51, 0.07, 0.97);
-    }
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.19, 0.51, 0.07, 0.97);
+  }
 
   &__logo {
     margin: 0 auto;
+    z-index: 10000;
 
     &-img {
       width: 150px;

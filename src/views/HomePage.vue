@@ -3,7 +3,50 @@ export default {
   data() {
     return {
       isHovered: false,
+      sections: {
+        1: {
+          title: "Starlink Mission",
+          text: "Recent Launch",
+          buttonText: "Rewatch",
+        },
+        2: {
+          title: "Starlink Mission",
+          text: "Upcoming Launch",
+          buttonText: "Watch",
+        },
+        3: {
+          title: "Advancing Human Spaceflight",
+          text: "",
+          buttonText: "Learn More",
+        },
+        4: {
+          title: "to Make Life Multiplanetary",
+          text: "",
+          buttonText: "Learn More",
+        },
+      },
     };
+  },
+  mounted() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const section = entry.target;
+            section.classList.add("visible");
+            observer.unobserve(section);
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.5,
+      }
+    );
+    const lazyLoadSections = document.querySelectorAll(".section__inner");
+    lazyLoadSections.forEach((section) => {
+      observer.observe(section);
+    });
   },
   methods: {
     animateButton() {
@@ -47,101 +90,32 @@ export default {
       </div>
     </div>
 
-    <Suspense>
-      <div class="home__section home__section-bg--1">
-        <div class="section__inner">
-          <p class="section__text">RECENT LAUNCH</p>
-          <h2 class="section__title">STARLINK MISSION</h2>
-          <a
-            href="#"
-            class="section__button"
-            @mouseover="animateButton"
-            @mouseout="resetButton"
-          >
-            <div
-              class="section__button-bg"
-              :class="{ 'section__button-bg--hover': !isHovered }"
-            ></div>
-            <span>REWATCH</span>
-          </a>
-        </div>
-
-        <div class="scroll-indicator">
-          <span></span>
-        </div>
+    <div
+      v-for="(section, i) in sections"
+      :key="i"
+      :class="`home__section home__section-bg--${i}`"
+    >
+      <div class="section__inner">
+        <p class="section__text">{{ section.text }}</p>
+        <h2 class="section__title">{{ section.title }}</h2>
+        <a
+          href="#"
+          class="section__button"
+          @mouseover="animateButton"
+          @mouseout="resetButton"
+        >
+          <div
+            class="section__button-bg"
+            :class="{ 'section__button-bg--hover': !isHovered }"
+          ></div>
+          <span>{{ section.buttonText }}</span>
+        </a>
       </div>
-    </Suspense>
 
-    <Suspense>
-      <div class="home__section home__section-bg--2">
-        <div class="section__inner">
-          <p class="section__text">UPCOMING LAUNCH</p>
-          <h2 class="section__title">STARLINK MISSION</h2>
-          <a
-            href="#"
-            class="section__button"
-            @mouseover="animateButton"
-            @mouseout="resetButton"
-          >
-            <div
-              class="section__button-bg"
-              :class="{ 'section__button-bg--hover': !isHovered }"
-            ></div>
-            <span>WATCH</span>
-          </a>
-        </div>
-
-        <div class="scroll-indicator">
-          <span></span>
-        </div>
-      </div> </Suspense
-    ><Suspense>
-      <div class="home__section home__section-bg--3">
-        <div class="section__inner">
-          <h2 class="section__title">ADVANCING HUMAN SPACEFLIGHT</h2>
-          <a
-            href="#"
-            class="section__button"
-            @mouseover="animateButton"
-            @mouseout="resetButton"
-          >
-            <div
-              class="section__button-bg"
-              :class="{ 'section__button-bg--hover': !isHovered }"
-            ></div>
-            <span>LEARN MORE</span>
-          </a>
-        </div>
-
-        <div class="scroll-indicator">
-          <span></span>
-        </div>
+      <div class="scroll-indicator">
+        <span></span>
       </div>
-    </Suspense>
-
-    <Suspense>
-      <div class="home__section home__section-bg--4">
-        <div class="section__inner">
-          <h2 class="section__title">TO MAKE LIFE MULTIPLANETARY</h2>
-          <a
-            href="#"
-            class="section__button"
-            @mouseover="animateButton"
-            @mouseout="resetButton"
-          >
-            <div
-              class="section__button-bg"
-              :class="{ 'section__button-bg--hover': !isHovered }"
-            ></div>
-            <span>LEARN MORE</span>
-          </a>
-        </div>
-
-        <div class="scroll-indicator">
-          <span></span>
-        </div>
-      </div>
-    </Suspense>
+    </div>
   </div>
 </template>
 
@@ -155,6 +129,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  text-transform: uppercase;
 }
 
 .section__video-bg {
@@ -213,6 +188,16 @@ export default {
   color: $primary-color;
   max-width: 1400px;
   margin: 0 auto;
+  opacity: 0;
+  transform: translateY(120px);
+  transition: opacity 1s ease, transform 1s ease, gap 1s ease;
+  gap: 40px;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    gap: 0;
+  }
 
   @media all and (min-width: 600px) {
     padding: $padding-md;
@@ -220,7 +205,9 @@ export default {
   }
 
   @media all and (min-width: 960px) {
-    gap: $padding-xs;
+    &.visible {
+      gap: $padding-xs;
+    }
   }
 }
 
@@ -262,9 +249,8 @@ export default {
   font-size: 0.9rem;
   font-weight: 700;
   position: relative;
-  // overflow: hidden;
-  transition: color 0.3s ease;
   overflow: hidden;
+  transition: color 0.3s ease;
 
   &:hover {
     color: $secondary-color;
@@ -277,7 +263,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #fff;
+    background-color: $primary-color;
     transform: translateY(100%);
     transition: transform 0.3s ease-out;
   }
